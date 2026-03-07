@@ -28,7 +28,7 @@ if not st.user.is_logged_in:
         c1, c2, c3 = st.columns([1, 3, 1])
         with c2:
             if st.button("Entrar com Google", use_container_width=True, type="primary"):
-                st.login()
+                st.login("google") # Adicione o "google" aqui entre parênteses
         st.info("🔒 Acesso restrito aos voluntários do Observatório Social.")
 
 else:
