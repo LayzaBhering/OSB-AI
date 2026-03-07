@@ -1,0 +1,9 @@
+# Arquivos com senhas 
+.env
+.streamlit/secrets.toml
+client_secret.json
+# Pastas de ambiente virtual 
+osbAI/
+# Arquivos temporários do sistema
+__pycache__/
+.vscode/
