@@ -1,8 +1,8 @@
-# 🤖 Agente de Inteligência Legislativa - OSB-SP
+# Agente de Inteligência Legislativa - OSB-SP
 
 Este projeto consiste em um suporte de inteligência artificial desenvolvido para o Observatório Social do Brasil - São Paulo. O agente automatiza a fiscalização e a análise de dados, utilizando técnicas avançadas de Web Scraping e Modelos de Linguagem de Grande Escala (LLMs).
 
-# 🚀 Funcionalidades Atuais
+# Funcionalidades Atuais
 
 1 - **Autenticação Segura**: Integração nativa com Google OAuth 2.0 para acesso restrito a voluntários e diretores;
 
