@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 st.set_page_config(page_title="OSB-SP AI Assistant", page_icon="⚖️", layout="wide")
 
-if not st.user.is_logged_in:
+if not st.user.get("is_logged_in", False): #st.user.is_logged_in:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.write("") 
@@ -28,7 +28,7 @@ if not st.user.is_logged_in:
         c1, c2, c3 = st.columns([1, 3, 1])
         with c2:
             if st.button("Entrar com Google", use_container_width=True, type="primary"):
-                st.login("google") # Adicione o "google" aqui entre parênteses
+                st.login("google") 
         st.info("🔒 Acesso restrito aos voluntários do Observatório Social.")
 
 else:
@@ -66,7 +66,7 @@ else:
             Outro ponto, retorne as solicitações com links úteis: como artigos ou textos / vídeos que falem diretante da requisição do(a) usuário(a)!
             """
             response = client.models.generate_content(
-                model="gemini-2.5-flash", 
+                model="gemini-2.0-flash", #gemini-2.5-flash
                 contents=contexto_sistema + prompt
             )
             return response.text
