@@ -94,7 +94,7 @@ def responder_usuario(prompt, contexto_adicional=""):
         """
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash-exp", #gemini-2.0-flash"
+            model="gemini-2.0-flash", #gemini-2.0-flash"
             contents=contexto_sistema + prompt
         )
         return response.text
