@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 st.set_page_config(
-    page_title="OSB-SP AI Assistant",
+    page_title="OSB-SP AI",
     page_icon="⚖️",
     layout="wide"
 )
