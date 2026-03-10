@@ -94,10 +94,9 @@ def responder_usuario(prompt, contexto_adicional=""):
         """
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-1.5-pro", #gemini-2.0-flash"
             contents=contexto_sistema + prompt
         )
-
         return response.text
 
     except Exception as e:
