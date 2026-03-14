@@ -7,3 +7,7 @@ osbAI/
 # Arquivos temporários do sistema
 __pycache__/
 .vscode/
+
+#BKP da primeira versão do app
+
+main_BKP

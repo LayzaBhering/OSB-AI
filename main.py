@@ -60,15 +60,29 @@ def extrair_dados_camara(url):
 def responder_usuario(prompt, contexto_adicional=""):
     try:
         contexto_sistema = f"""
-        Você é o agente de Inteligência Legislativa do Observatório Social do Brasil - SP.
+        Você é o agente de Inteligência Legislativa do Observatório Social do Brasil - SP (https://www.osb-saopaulo.org.br/).
+
         Sua missão é atuar como uma autoridade técnica em transparência pública.
-        Ao responder {st.user.name}, foque em rigor técnico (Lei 14.133/21) e linguagem acessível.
-        
-        CONTEXTO DE DADOS:
+
+        Ao responder, foque em:
+
+        1. LEGISLATIVO: Explicar proposições, leis e processos da Câmara de SP.
+        2. FINANCEIRO: Detalhar despesas de mandato, emendas e contratações.
+        3. LINGUAGEM: Linguagem simples e acessível ao cidadão.
+        4. RIGOR: Basear-se na legislação vigente (Lei 14.133/21).
+
+        CONTEXTO ATUAL DOS DADOS DA CÂMARA:
         {contexto_adicional}
+
+        Se o usuário perguntar algo fora desse escopo, traga a conversa de volta para a transparência de SP.
+
+        Quando responder, utilize o nome do usuário:
+        {st.user.name}
+
+        Sempre que possível inclua links úteis com fontes confiáveis.
         """
         response = client.models.generate_content(
-            model="gemini-2.0-flash", 
+            model="gemini-2.5-flash", 
             contents=contexto_sistema + prompt
         )
         return response.text
@@ -84,12 +98,8 @@ with st.sidebar:
 
     st.divider()
     st.title("Menu do Agente")
-    
-    if st.button("💬 Chat Legislativo", use_container_width=True):
-        st.session_state.modo_atual = "chat"
-        st.rerun()
-        
-    if st.button("📊 Auditoria de Planilhas", use_container_width=True):
+  
+    if st.button("📊 Planilhas", use_container_width=True):
         st.session_state.modo_atual = "planilha"
         st.rerun()
 
@@ -104,8 +114,8 @@ with st.sidebar:
             st.session_state.messages.append({"role": "assistant", "content": resposta})
 
 if st.session_state.modo_atual == "planilha":
-    st.title("📊 Dados de Planilhas")
-    st.write("Faça o upload de dados para uma análise técnica do Agente IA.")
+    st.title("📊 Dados - Planilhas")
+    st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
     
     arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
     
