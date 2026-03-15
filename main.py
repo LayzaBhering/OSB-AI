@@ -28,7 +28,7 @@ if not st.user.is_logged_in:
                 <h1 style="color: #006437; margin-bottom: 10px;">🤖 Agente IA OSB-SP</h1>
                 <p style="color: #4b5563; font-size: 1.1em;">Assistente de Inteligência Legislativa</p>
                 <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-                <p style="color: #6b7280; margin-bottom: 25px;">Identifique-se com sua conta Google para auditar dados.</p>
+                <p style="color: #6b7280; margin-bottom: 25px;">Identifique-se com sua conta Google para utilizar o agente de IA.</p>
             </div>
             """,
             unsafe_allow_html=True
@@ -126,8 +126,8 @@ if st.session_state.modo_atual == "planilha":
             else:
                 df = pd.read_excel(arquivo_upload)
             
-            st.subheader("Visualização dos Dados (Top 50)")
-            st.dataframe(df.head(50))
+            st.subheader("Visualização dos Dados (até 10.000)")
+            st.dataframe(df.head(10000))
             
             if st.button("Analisar", type="primary"):
                 resumo = df.head(30).to_string(index=False)
