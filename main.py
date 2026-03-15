@@ -148,13 +148,13 @@ else:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-    if prompt := st.chat_input("Como posso ajudar na fiscalização hoje?"):
+    if prompt := st.chat_input("Como posso te ajudar hoje?"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
         with st.chat_message("assistant"):
-            with st.spinner("Analisando legislação..."):
+            with st.spinner("Analisando requisição..."):
                 resposta = responder_usuario(prompt)
                 st.markdown(resposta)
                 st.session_state.messages.append({"role": "assistant", "content": resposta})
