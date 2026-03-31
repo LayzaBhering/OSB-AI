@@ -44,6 +44,28 @@ if not st.user.is_logged_in:
 api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
+#Função criada para a interação com o site. Uso tanto no botão de sair, quando no else, pra ser default
+def chat_input_agenteIA():
+    st.title("🤖 Agente IA OSB-SP")
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("Como posso te ajudar hoje?"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Analisando requisição..."):
+                resposta = responder_usuario(prompt)
+                st.markdown(resposta)
+                st.session_state.messages.append({"role": "assistant", "content": resposta})
+
 def extrair_dados_camara(url):
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
@@ -91,19 +113,26 @@ def responder_usuario(prompt, contexto_adicional=""):
 
 with st.sidebar:
     st.markdown(f"<h2 style='color: #006437;'>👤 Olá, {st.user.name}!</h2>", unsafe_allow_html=True)
-    
+
     if st.button("Sair", use_container_width=True):
         st.logout()
         st.rerun()
 
     st.divider()
+
+    #Menu lateral do sidebar, onde há botões de navegação
     st.title("Menu do Agente")
   
     if st.button("📊 Planilhas", use_container_width=True):
         st.session_state.modo_atual = "planilha"
         st.rerun()
+    
+    if st.button("Chat", use_container_width=True):
+        st.session_state.modo_atual = "Chat"
+        st.rerun()
 
     st.divider()
+
     st.title("Ações Rápidas")
     if st.button("Analisar Portal Transparência"):
         with st.spinner("Lendo portal..."):
@@ -138,23 +167,7 @@ if st.session_state.modo_atual == "planilha":
         except Exception as e:
             st.error(f"Erro ao processar arquivo: {e}")
 
+if st.session_state.modo_atual == "Chat":
+    chat_input_agenteIA()
 else:
-    st.title("🤖 Agente IA OSB-SP")
-
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    if prompt := st.chat_input("Como posso te ajudar hoje?"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-
-        with st.chat_message("assistant"):
-            with st.spinner("Analisando requisição..."):
-                resposta = responder_usuario(prompt)
-                st.markdown(resposta)
-                st.session_state.messages.append({"role": "assistant", "content": resposta})
+    chat_input_agenteIA()
