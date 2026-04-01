@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import pandas as pd
+import time
 
 load_dotenv()
 
@@ -170,6 +171,43 @@ def responder_planilha(prompt, contexto_adicional=""):
     except Exception as e:
         return f"Erro na IA: {e}"
     
+def processar_planilha_por_lotes(df, prompt_usuario):
+    tamanho_lote = 500  # Quantidade de linhas por vez para não estourar a cota
+    analises_parciais = []
+    progresso_bar = st.progress(0)
+    status_texto = st.empty()
+    # Calcula quantos lotes existem
+    linhas_totais = len(df)
+    total_lotes = (linhas_totais // tamanho_lote) + (1 if linhas_totais % tamanho_lote > 0 else 0)
+    for i, inicio in enumerate(range(0, linhas_totais, tamanho_lote)):
+        fim = inicio + tamanho_lote
+        df_lote = df.iloc[inicio:fim]
+        contexto_lote = df_lote.to_string(index=False)
+        status_texto.text(f"Analisando lote {i+1} de {total_lotes}...")
+
+        resposta = responder_planilha(
+            f"Analise este lote de dados ({i+1}/{total_lotes}) e extraia pontos críticos: {prompt_usuario}", 
+            contexto_adicional=contexto_lote
+        )
+        analises_parciais.append(f"--- ANÁLISE LOTE {i+1} ---\n{resposta}")
+        progresso_bar.progress((i + 1) / total_lotes)
+        if i < total_lotes - 1:
+            time.sleep(5) 
+
+    status_texto.text("Consolidando relatório final...")
+
+    contexto_final = "\n\n".join(analises_parciais)
+    
+    # !!!!!!! Limita o contexto final para não estourar o prompt de saída
+    relatorio_final = responder_planilha(
+        "Gere um relatório de auditoria final consolidado e estruturado unindo as análises de todos os lotes anteriores.", 
+        contexto_adicional=contexto_final[:15000] 
+    )
+    status_texto.empty()
+    progresso_bar.empty()
+    return relatorio_final
+
+
 if st.session_state.modo_atual.lower() == "planilha":
     st.title("📊 Dados - Planilhas")
     st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
@@ -213,10 +251,12 @@ if st.session_state.modo_atual.lower() == "planilha":
             st.divider()
 
             if st.button("Gerar Auditoria", type="primary"):
-                with st.spinner("O Agente está auditando as linhas..."):
-                    analise = responder_planilha("Realize uma auditoria técnica completa e detalhada sobre estes dados.", contexto_adicional=resumo_dados)
-                    st.markdown("### ⚖️ Resultado da Auditoria")
-                    st.info(analise)
+                analise = processar_planilha_por_lotes(
+                    df, 
+                    "Realize uma auditoria técnica completa e detalhada sobre estes dados, buscando inconsistências, gastos atípicos e conformidade com a transparência pública."
+                )
+                st.markdown("### ⚖️ Resultado da Auditoria Final")
+                st.info(analise)
         except Exception as e:
             st.error(f"Erro ao processar arquivo: {e}")
 else:
