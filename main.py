@@ -164,7 +164,7 @@ def responder_planilha(prompt, contexto_adicional=""):
         Sempre que possível inclua links úteis com fontes confiáveis e crie uma tabela resumo da solicitação de {st.user.name}.
         """
         response = client.models.generate_content(
-            model="gemini-1.5-flash-002", 
+            model="gemini-1.5-flash-8b", 
             contents=contexto_sistema + prompt
         )
         return response.text
@@ -223,7 +223,7 @@ if st.session_state.modo_atual.lower() == "planilha":
             
             st.subheader("Visualização dos Dados")
             st.dataframe(df) 
-            resumo_dados = df.to_string(index=False)
+            resumo_dados = df.to_csv(index=False)
             #Serve para contar as linhas da tabela e suas colunas
             col_metrica1, col_metrica2 = st.columns(2)
             with col_metrica1:
