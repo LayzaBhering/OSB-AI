@@ -164,7 +164,7 @@ def responder_planilha(prompt, contexto_adicional=""):
         Sempre que possível inclua links úteis com fontes confiáveis e crie uma tabela resumo da solicitação de {st.user.name}.
         """
         response = client.models.generate_content(
-            model="gemini 2.5 Pro", 
+            model="gemini-2.5-Pro", 
             contents=contexto_sistema + prompt
         )
         return response.text
