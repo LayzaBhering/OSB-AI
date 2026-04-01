@@ -164,7 +164,7 @@ def responder_planilha(prompt, contexto_adicional=""):
         Sempre que possível inclua links úteis com fontes confiáveis e crie uma tabela resumo da solicitação de {st.user.name}.
         """
         response = client.models.generate_content(
-            model="gemini-2.5-ro", 
+            model="gemini-2.5-pro", 
             contents=contexto_sistema + prompt
         )
         return response.text
@@ -213,13 +213,7 @@ if st.session_state.modo_atual.lower() == "planilha":
     st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
     
     arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
-    
-    if st.session_state.modo_atual.lower() == "planilha":
-        st.title("📊 Dados - Planilhas")
-        st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
-        
-        arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
-    
+
     if arquivo_upload:
         try:
             if arquivo_upload.name.endswith('.csv'):
