@@ -220,12 +220,6 @@ if st.session_state.modo_atual.lower() == "planilha":
         
         arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
     
-if st.session_state.modo_atual.lower() == "planilha":
-    st.title("📊 Dados - Planilhas")
-    st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
-    
-    arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
-    
     if arquivo_upload:
         try:
             if arquivo_upload.name.endswith('.csv'):
