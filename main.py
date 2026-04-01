@@ -192,11 +192,7 @@ if st.session_state.modo_atual.lower() == "planilha":
                 st.metric("Total de Linhas", len(df))
             with col_metrica2:
                 st.metric("Total de Colunas", df.shape[1])
-            
-            st.divider()
 
-            st.subheader("💬 Chat ")
-            
             if "messages_planilha" not in st.session_state:
                 st.session_state.messages_planilha = []
 
@@ -216,7 +212,7 @@ if st.session_state.modo_atual.lower() == "planilha":
 
             st.divider()
 
-            if st.button("🚀 Gerar Auditoria Completa", type="primary"):
+            if st.button("Gerar Auditoria", type="primary"):
                 with st.spinner("O Agente está auditando as linhas..."):
                     analise = responder_planilha("Realize uma auditoria técnica completa e detalhada sobre estes dados.", contexto_adicional=resumo_dados)
                     st.markdown("### ⚖️ Resultado da Auditoria")
