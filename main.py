@@ -46,8 +46,6 @@ client = genai.Client(api_key=api_key)
 
 #Função criada para a interação com o site. Uso tanto no botão de sair, quando no else, pra ser default
 def chat_input_agenteIA():
-    st.title("🤖 Agente IA OSB-SP")
-
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -110,7 +108,7 @@ def responder_usuario(prompt, contexto_adicional=""):
         return response.text
     except Exception as e:
         return f"Erro na IA: {e}"
-
+    
 with st.sidebar:
     st.markdown(f"<h2 style='color: #006437;'>👤 Olá, {st.user.name}!</h2>", unsafe_allow_html=True)
 
@@ -142,7 +140,37 @@ with st.sidebar:
             if "messages" not in st.session_state: st.session_state.messages = []
             st.session_state.messages.append({"role": "assistant", "content": resposta})
 
-if st.session_state.modo_atual == "planilha":
+def responder_planilha(prompt, contexto_adicional=""):
+    try:
+        contexto_sistema = f"""
+        Você é o agente de Inteligência Legislativa do Observatório Social do Brasil - SP (https://www.osb-saopaulo.org.br/).
+
+        Sua missão é atuar como um analista de aruivos e  autoridade técnica em transparência pública, respectivamente.
+
+        Ao responder, nesse caso, foque em:
+        1. FOCO DESSA ETAPA: Detalhar sobre o arquivo que foi realizado upload, a reposta deve ser baseada na pergunta do usuário(a) {st.user.name}.
+        3. LINGUAGEM: Linguagem simples e acessível ao cidadão.
+        4. RIGOR: Basear-se na legislação vigente (Lei 14.133/21).
+
+        CONTEXTO ATUAL DOS DADOS DA CÂMARA:
+        {contexto_adicional}
+
+        Se o usuário perguntar algo fora desse escopo, traga a conversa de volta para a transparência de SP.
+
+        Quando responder, utilize o nome do usuário:
+        {st.user.name}
+
+        Sempre que possível inclua links úteis com fontes confiáveis e crie uma tabela resumo da solicitação de {st.user.name}.
+        """
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", 
+            contents=contexto_sistema + prompt
+        )
+        return response.text
+    except Exception as e:
+        return f"Erro na IA: {e}"
+    
+if st.session_state.modo_atual.lower() == "planilha":
     st.title("📊 Dados - Planilhas")
     st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
     
@@ -155,19 +183,46 @@ if st.session_state.modo_atual == "planilha":
             else:
                 df = pd.read_excel(arquivo_upload)
             
-            st.subheader("Visualização dos Dados (até 10.000)")
-            st.dataframe(df.head(10000))
+            st.subheader("Visualização dos Dados")
+            st.dataframe(df) 
+            resumo_dados = df.to_string(index=False)
+            #Serve para contar as linhas da tabela e suas colunas
+            col_metrica1, col_metrica2 = st.columns(2)
+            with col_metrica1:
+                st.metric("Total de Linhas", len(df))
+            with col_metrica2:
+                st.metric("Total de Colunas", df.shape[1])
             
-            if st.button("Analisar", type="primary"):
-                resumo = df.head(30).to_string(index=False)
+            st.divider()
+
+            st.subheader("💬 Chat ")
+            
+            if "messages_planilha" not in st.session_state:
+                st.session_state.messages_planilha = []
+
+            for message in st.session_state.messages_planilha:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+
+            if prompt_planilha := st.chat_input("Pergunte algo sobre este arquivo!", key="chat_p"):
+                st.session_state.messages_planilha.append({"role": "user", "content": prompt_planilha})
+                with st.chat_message("user"):
+                    st.markdown(prompt_planilha)
+                with st.chat_message("assistant"):
+                    with st.spinner("Analisando arquivo..."):
+                        resposta = responder_planilha(prompt_planilha, contexto_adicional=resumo_dados)
+                        st.markdown(resposta)
+                        st.session_state.messages_planilha.append({"role": "assistant", "content": resposta})
+
+            st.divider()
+
+            if st.button("🚀 Gerar Auditoria Completa", type="primary"):
                 with st.spinner("O Agente está auditando as linhas..."):
-                    analise = responder_usuario(f"Resumo: {resumo}")
+                    analise = responder_planilha("Realize uma auditoria técnica completa e detalhada sobre estes dados.", contexto_adicional=resumo_dados)
                     st.markdown("### ⚖️ Resultado da Auditoria")
                     st.info(analise)
         except Exception as e:
             st.error(f"Erro ao processar arquivo: {e}")
-
-if st.session_state.modo_atual == "Chat":
-    chat_input_agenteIA()
 else:
+    st.title("🤖 Agente IA OSB-SP")
     chat_input_agenteIA()
