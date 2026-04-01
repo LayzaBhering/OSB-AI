@@ -164,7 +164,7 @@ def responder_planilha(prompt, contexto_adicional=""):
         Sempre que possível inclua links úteis com fontes confiáveis e crie uma tabela resumo da solicitação de {st.user.name}.
         """
         response = client.models.generate_content(
-            model="gemini-2.5-pro", 
+            model="gemini-2.5-ro", 
             contents=contexto_sistema + prompt
         )
         return response.text
@@ -214,6 +214,18 @@ if st.session_state.modo_atual.lower() == "planilha":
     
     arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
     
+    if st.session_state.modo_atual.lower() == "planilha":
+        st.title("📊 Dados - Planilhas")
+        st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
+        
+        arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
+    
+if st.session_state.modo_atual.lower() == "planilha":
+    st.title("📊 Dados - Planilhas")
+    st.write("Faça o upload dos dados para uma análise técnica do Agente IA.")
+    
+    arquivo_upload = st.file_uploader("Subir planilha (CSV ou XLSX)", type=["csv", "xlsx"])
+    
     if arquivo_upload:
         try:
             if arquivo_upload.name.endswith('.csv'):
@@ -223,8 +235,15 @@ if st.session_state.modo_atual.lower() == "planilha":
             
             st.subheader("Visualização dos Dados")
             st.dataframe(df) 
-            resumo_dados = df.to_csv(index=False)
-            #Serve para contar as linhas da tabela e suas colunas
+
+            resumo_dados = f"""
+            Colunas: {list(df.columns)}
+            Total de linhas: {len(df)}
+
+            Amostra aleatória:
+            {df.sample(min(30, len(df))).to_string(index=False)}
+            """
+
             col_metrica1, col_metrica2 = st.columns(2)
             with col_metrica1:
                 st.metric("Total de Linhas", len(df))
@@ -240,13 +259,26 @@ if st.session_state.modo_atual.lower() == "planilha":
 
             if prompt_planilha := st.chat_input("Pergunte algo sobre este arquivo!", key="chat_p"):
                 st.session_state.messages_planilha.append({"role": "user", "content": prompt_planilha})
+
                 with st.chat_message("user"):
                     st.markdown(prompt_planilha)
+
                 with st.chat_message("assistant"):
                     with st.spinner("Analisando arquivo..."):
-                        resposta = responder_planilha(prompt_planilha, contexto_adicional=resumo_dados)
+
+                        if len(df) > 500:
+                            resposta = processar_planilha_por_lotes(df, prompt_planilha)
+                        else:
+                            resposta = responder_planilha(
+                                prompt_planilha, 
+                                contexto_adicional=resumo_dados
+                            )
+
                         st.markdown(resposta)
-                        st.session_state.messages_planilha.append({"role": "assistant", "content": resposta})
+                        st.session_state.messages_planilha.append({
+                            "role": "assistant",
+                            "content": resposta
+                        })
 
             st.divider()
 
@@ -257,8 +289,10 @@ if st.session_state.modo_atual.lower() == "planilha":
                 )
                 st.markdown("### ⚖️ Resultado da Auditoria Final")
                 st.info(analise)
+
         except Exception as e:
             st.error(f"Erro ao processar arquivo: {e}")
+
 else:
     st.title("🤖 Agente IA OSB-SP")
     chat_input_agenteIA()
