@@ -1,26 +1,18 @@
+import streamlit as st
 import os
-import pandas as pd
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 
 load_dotenv()
 
 def get_connection():
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASS")
-    host = os.getenv("DB_HOST")
-    port = os.getenv("DB_PORT")
-    db_name = os.getenv("DB_NAME")
-    
+    user = st.secrets.get("DB_USER") or os.getenv("DB_USER")
+    password = st.secrets.get("DB_PASS") or os.getenv("DB_PASS")
+    host = st.secrets.get("DB_HOST") or os.getenv("DB_HOST")
+    port = st.secrets.get("DB_PORT") or os.getenv("DB_PORT")
+    db_name = st.secrets.get("DB_NAME") or os.getenv("DB_NAME")
+    if not port:
+        raise ValueError("A porta do banco de dados (DB_PORT) não foi configurada!")
+
     conn_str = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
     return create_engine(conn_str)
-
-def testar_conexao():
-    engine = get_connection()
-    query = "SELECT version();" 
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(query, conn)
-            return f"Conectado com sucesso! Versão do banco: {df.iloc[0,0]}"
-    except Exception as e:
-        return f"Erro ao conectar na AWS: {e}"
