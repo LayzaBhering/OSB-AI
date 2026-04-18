@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 import pandas as pd
 import time
 
+from database import testar_conexao
+
 load_dotenv()
 
 st.set_page_config(
@@ -44,6 +46,10 @@ if not st.user.is_logged_in:
 
 api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
+
+if __name__ == "__main__":
+    resultado = testar_conexao()
+    print(resultado)
 
 #Função criada para a interação com o site. Uso tanto no botão de sair, quando no else, pra ser default
 def chat_input_agenteIA():
@@ -91,6 +97,8 @@ def responder_usuario(prompt, contexto_adicional=""):
         2. FINANCEIRO: Detalhar despesas de mandato, emendas e contratações.
         3. LINGUAGEM: Linguagem simples e acessível ao cidadão.
         4. RIGOR: Basear-se na legislação vigente (Lei 14.133/21).
+        5. RIGOR: Consultar o Art. 37 da Constituição Federal de 1988.
+        6. RIGOR: Lei 12.527/2011 - Lei de Acesso à Informação
 
         CONTEXTO ATUAL DOS DADOS DA CÂMARA:
         {contexto_adicional}
@@ -152,6 +160,8 @@ def responder_planilha(prompt, contexto_adicional=""):
         1. FOCO DESSA ETAPA: Detalhar sobre o arquivo que foi realizado upload, a reposta deve ser baseada na pergunta do usuário(a) {st.user.name}.
         3. LINGUAGEM: Linguagem simples e acessível ao cidadão.
         4. RIGOR: Basear-se na legislação vigente (Lei 14.133/21).
+        5. RIGOR: Consultar o Art. 37 da Constituição Federal de 1988.
+        6. RIGOR: Lei 12.527/2011 - Lei de Acesso à Informação
 
         CONTEXTO ATUAL DOS DADOS DA CÂMARA:
         {contexto_adicional}
