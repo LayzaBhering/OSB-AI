@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import pandas as pd
 import time
 
-from database import testar_conexao
+from database import get_connection
 
 load_dotenv()
 
@@ -48,7 +48,7 @@ api_key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 if __name__ == "__main__":
-    resultado = testar_conexao()
+    resultado = get_connection()
     print(resultado)
 
 #Função criada para a interação com o site. Uso tanto no botão de sair, quando no else, pra ser default
