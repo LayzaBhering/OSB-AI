@@ -7,3 +7,4 @@ Authlib
 pandas
 openpyxl
 sqlalchemy
+dotenv
